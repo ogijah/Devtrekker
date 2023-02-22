@@ -7,7 +7,7 @@ import (
 )
 
 type Input struct {
-	Id        int64  `json:"id"`
+	Id        int    `json:"id"`
 	FirstName string `json:"firstname"`
 	LastName  string `json:"lastname"`
 	Telephone string `json:"telephone"`
@@ -24,25 +24,24 @@ func UploadTelephone(newInput Input) {
 	} else {
 		newInput.Id = output.Results[len(output.Results)-1].Id + 1
 	}
-	writeTelephoneToFile(newInput)
+	output.Results = append(output.Results, newInput)
+	writeTelephoneToFile(output)
 }
 
 func GetTelephones() Output {
 	var output Output
-	var results []Input
-	content, err := ioutil.ReadFile("telephones.json")
+	content, err := ioutil.ReadFile("data/telephones.json")
 	if err != nil {
 		return output
 	}
-	err = json.Unmarshal(content, &results)
+	err = json.Unmarshal(content, &output)
 	if err != nil {
 		log.Fatal(err)
 	}
-	output.Results = results
 	return output
 }
 
-func GetTelephoneById(id int64) Input {
+func GetTelephoneById(id int) Input {
 	output := GetTelephones()
 	for _, result := range output.Results {
 		if result.Id == id {
@@ -52,28 +51,26 @@ func GetTelephoneById(id int64) Input {
 	return Input{}
 }
 
-func DeleteTelephone(id int64) {
+func DeleteTelephone(id int) {
 	output := GetTelephones()
 	for i, result := range output.Results {
 		if result.Id == id {
 			output.Results = remove(output.Results, i)
 		}
 	}
-
+	writeTelephoneToFile(output)
 }
 
 func remove(slice []Input, s int) []Input {
 	return append(slice[:s], slice[s+1:]...)
 }
 
-func writeTelephoneToFile(input Input) {
-	output := GetTelephones()
-	output.Results = append(output.Results, input)
+func writeTelephoneToFile(output Output) {
 	newOutput, err := json.Marshal(output)
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = ioutil.WriteFile("telephones.json", newOutput, 0644)
+	err = ioutil.WriteFile("data/telephones.json", newOutput, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
