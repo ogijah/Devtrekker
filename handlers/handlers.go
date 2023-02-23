@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/go-playground/validator"
 	"github.com/gorilla/mux"
 )
 
@@ -19,7 +20,11 @@ func NewHandler() *Handler {
 }
 
 func (h *Handler) GetTelephones(rw http.ResponseWriter, req *http.Request) {
-	output := data.GetTelephones()
+	output, err := data.GetTelephones()
+	if err != nil {
+		http.Error(rw, err.Error(), http.StatusBadRequest)
+		return
+	}
 	renderJSON(rw, output)
 }
 
@@ -29,7 +34,7 @@ func (h *Handler) GetTelephoneById(rw http.ResponseWriter, req *http.Request) {
 		http.Error(rw, "bad parameter of id", http.StatusBadRequest)
 		return
 	}
-	input := data.GetTelephoneById(id)
+	input, _ := data.GetTelephoneById(id)
 	if (input == data.Input{}) {
 		http.Error(rw, "there is no telephone number by that id", http.StatusNotFound)
 		return
@@ -43,7 +48,8 @@ func (h *Handler) DeleteTelephone(rw http.ResponseWriter, req *http.Request) {
 		http.Error(rw, "bad parameter of id", http.StatusBadRequest)
 		return
 	}
-	if (data.GetTelephoneById(id) == data.Input{}) {
+	input, _ := data.GetTelephoneById(id)
+	if (input == data.Input{}) {
 		http.Error(rw, "there is no telephone number by that id", http.StatusNotFound)
 		return
 	}
@@ -67,8 +73,17 @@ func (h *Handler) UploadTelephone(rw http.ResponseWriter, req *http.Request) {
 		http.Error(rw, err.Error(), http.StatusBadRequest)
 		return
 	}
-
-	data.UploadTelephone(*newInput)
+	validate := validator.New()
+	err = validate.Struct(newInput)
+	if err != nil {
+		http.Error(rw, err.Error(), http.StatusBadRequest)
+		return
+	}
+	err = data.UploadTelephone(*newInput)
+	if err != nil {
+		http.Error(rw, err.Error(), http.StatusBadRequest)
+		return
+	}
 }
 
 func decodeBody(r io.Reader) (*data.Input, error) {
