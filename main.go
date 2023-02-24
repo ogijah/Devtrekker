@@ -22,7 +22,7 @@ func main() {
 	router.HandleFunc("/telephone/{id:[0-9]+}", h.DeleteTelephone).Methods("DELETE")
 
 	s := http.Server{
-		Addr:         "0.0.0.0:9090",    // configure the bind address
+		Addr:         ":9090",           // configure the bind address
 		Handler:      router,            // set the default handler
 		ReadTimeout:  5 * time.Second,   // max time to read request from the client
 		WriteTimeout: 10 * time.Second,  // max time to write response to the client
