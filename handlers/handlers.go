@@ -19,8 +19,10 @@ func NewHandler() *Handler {
 	return &Handler{}
 }
 
+const path = "data/telephones.json"
+
 func (h *Handler) GetTelephones(rw http.ResponseWriter, req *http.Request) {
-	output, err := data.GetTelephones()
+	output, err := data.GetTelephones(path)
 	if err != nil {
 		http.Error(rw, err.Error(), http.StatusBadRequest)
 		return
@@ -34,7 +36,7 @@ func (h *Handler) GetTelephoneById(rw http.ResponseWriter, req *http.Request) {
 		http.Error(rw, "bad parameter of id", http.StatusBadRequest)
 		return
 	}
-	input, _ := data.GetTelephoneById(id)
+	input, _ := data.GetTelephoneById(id, path)
 	if (input == data.Input{}) {
 		http.Error(rw, "there is no telephone number by that id", http.StatusNotFound)
 		return
@@ -48,12 +50,12 @@ func (h *Handler) DeleteTelephone(rw http.ResponseWriter, req *http.Request) {
 		http.Error(rw, "bad parameter of id", http.StatusBadRequest)
 		return
 	}
-	input, _ := data.GetTelephoneById(id)
+	input, _ := data.GetTelephoneById(id, path)
 	if (input == data.Input{}) {
 		http.Error(rw, "there is no telephone number by that id", http.StatusNotFound)
 		return
 	}
-	data.DeleteTelephone(id)
+	data.DeleteTelephone(id, path)
 }
 
 func (h *Handler) UploadTelephone(rw http.ResponseWriter, req *http.Request) {
@@ -79,7 +81,7 @@ func (h *Handler) UploadTelephone(rw http.ResponseWriter, req *http.Request) {
 		http.Error(rw, err.Error(), http.StatusBadRequest)
 		return
 	}
-	err = data.UploadTelephone(*newInput)
+	_, err = data.UploadTelephone(*newInput, path)
 	if err != nil {
 		http.Error(rw, err.Error(), http.StatusBadRequest)
 		return

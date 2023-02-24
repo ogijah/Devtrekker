@@ -17,13 +17,13 @@ type Output struct {
 	Results []Input `json:"results"`
 }
 
-func UploadTelephone(newInput Input) error {
-	if checkIfTelephoneExists(newInput.Telephone) {
-		return errors.New("Phone number already exists!")
+func UploadTelephone(newInput Input, path string) (Output, error) {
+	if checkIfTelephoneExists(newInput.Telephone, path) {
+		return Output{}, errors.New("Phone number already exists!")
 	}
-	output, err := GetTelephones()
+	output, err := GetTelephones(path)
 	if err != nil {
-		return err
+		return Output{}, err
 	}
 	if len(output.Results) == 0 {
 		newInput.Id = 1
@@ -31,12 +31,12 @@ func UploadTelephone(newInput Input) error {
 		newInput.Id = output.Results[len(output.Results)-1].Id + 1
 	}
 	output.Results = append(output.Results, newInput)
-	return writeTelephoneToFile(output)
+	return writeTelephoneToFile(output, path)
 }
 
-func GetTelephones() (Output, error) {
+func GetTelephones(path string) (Output, error) {
 	var output Output
-	content, err := ioutil.ReadFile("data/telephones.json")
+	content, err := ioutil.ReadFile(path)
 	if err != nil {
 		return output, nil
 	}
@@ -47,8 +47,8 @@ func GetTelephones() (Output, error) {
 	return output, nil
 }
 
-func GetTelephoneById(id int) (Input, error) {
-	output, err := GetTelephones()
+func GetTelephoneById(id int, path string) (Input, error) {
+	output, err := GetTelephones(path)
 	if err != nil {
 		return Input{}, err
 	}
@@ -60,37 +60,37 @@ func GetTelephoneById(id int) (Input, error) {
 	return Input{}, nil
 }
 
-func DeleteTelephone(id int) error {
-	output, err := GetTelephones()
+func DeleteTelephone(id int, path string) (Output, error) {
+	output, err := GetTelephones(path)
 	if err != nil {
-		return err
+		return Output{}, err
 	}
 	for i, result := range output.Results {
 		if result.Id == id {
 			output.Results = remove(output.Results, i)
 		}
 	}
-	return writeTelephoneToFile(output)
+	return writeTelephoneToFile(output, path)
 }
 
 func remove(slice []Input, s int) []Input {
 	return append(slice[:s], slice[s+1:]...)
 }
 
-func writeTelephoneToFile(output Output) error {
+func writeTelephoneToFile(output Output, path string) (Output, error) {
 	newOutput, err := json.Marshal(output)
 	if err != nil {
-		return err
+		return Output{}, err
 	}
-	err = ioutil.WriteFile("data/telephones.json", newOutput, 0644)
+	err = ioutil.WriteFile(path, newOutput, 0644)
 	if err != nil {
-		return err
+		return Output{}, err
 	}
-	return nil
+	return output, nil
 }
 
-func checkIfTelephoneExists(telephone string) bool {
-	output, err := GetTelephones()
+func checkIfTelephoneExists(telephone string, path string) bool {
+	output, err := GetTelephones(path)
 	if err != nil {
 		return false
 	}
