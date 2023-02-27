@@ -17,3 +17,4 @@ http://localhost:9090/telephone (POST) - upload a new number (it requires JSON o
 1) In case bash.sh is not executable on your machine: *chmod +x bash.sh*
 2) run *./bash.sh* - it will automatically run tests, build the main.go and run the main program with 
    a parameter from the command line
+3) the answers for questions related to the task are in the *answers.txt* file (on Serbian)
