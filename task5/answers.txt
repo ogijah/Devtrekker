@@ -1,0 +1,17 @@
+* Koja je razlika izmedju 'var' i ':=' definisanja varijabli?
+
+Postoji nekoliko razlika izmedju 'var' i  ':=' definisanja promenljivih:
+
+1) Definisanje uz ':=' automatski radi i deklaraciju i inicijalizaciju, dok sa 'var' kljucnom reci imamo 
+   mogucnost da to uradimo posebno.
+
+2) Sa 'var' moramo da definisemo i tip promenljive, dok sa ':=' to automatski bude uradjeno na osnovu vrednosti.
+
+3) 'var' promenljive mogu biti definisane i van funkcija, dok promenljive definisane sa ':=' samo unutar funkcija.
+
+
+* Mozes li da zakljucis koji je limit ulaza preko komandne linije? (na operativnom
+sistemu na kom radis)
+
+Na osnovu komande $ getconf ARG_MAX dobijamo limit argumenata u bajtovima. Konkretno na mom operativnom sistemu
+(Ubuntu 22.04.1 LTS) u pitanju je broj od 2097152 bajtova.
